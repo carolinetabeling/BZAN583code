@@ -1,18 +1,9 @@
-Rprof()
-start <- Sys.time()
+library(arrow)
+library(data.table)
+library(dplyr)
 
-set.seed(123)
-ntrials <- 1000000
-pitch_prob <- c(.4,.6) #ball then strike
-pitch <- c(0,1) #ball - 0, strike - 1
-pitcher <- sample(pitch, size = 6*ntrials, replace = TRUE, prob = pitch_prob)
+weather <- data.table::fread("/projects/bckj/Team4/Data/automatic_weather_stations_inmet_brazil_2000_2021.csv", sep = ";")
 
-strikeouts <- numeric(length(pitcher)/6)  
-for (i in seq(1, length(pitcher), by = 6)) {
-  strikeouts[i/6] <- sum(pitcher[i:(i+5)]) >= 3
-}
-mean(strikeouts)
-Rprof(NULL)
-summaryRprof()
+arrow::write_dataset(weather, "/projects/bckj/Team4/Data/parquet_data", partitioning = c("ESTACAO"))
 
-Sys.time() - start
+#read_parquet("/projects/bckj/Team4/Data/parquet_datapart-0.parquet")
